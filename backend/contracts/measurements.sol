@@ -6,7 +6,7 @@ pragma solidity  ^0.8.0;
 // The user can add measurements and edit them
 // The user can also delete measurements
 
-contract Map {
+contract Measurements {
     bytes32 private passwordHash;
     string public basicMeasurements;
     string public detailedMeasurements;
