@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity  ^0.8.0;
+pragma solidity  ^0.8.19;
 
 // This contract is used to store basic and detailed body measurements for a user
 // They will be encrypted and stored on the blockchain accessible only by seperate passwords

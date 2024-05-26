@@ -22,9 +22,9 @@ var input = {
 };
 
 const output = JSON.parse(solc.compile(JSON.stringify(input)));
-console.log('🚀 ~ output:', output);
+// console.log('🚀 ~ output:', output);
 
 const mainContract = output.contracts[contractToCompile]['Measurements'];
-console.log('🚀 ~ mainContract:', mainContract);
+// console.log('🚀 ~ mainContract:', mainContract);
 
-module.exports = { mainContract };
+module.exports = mainContract;
