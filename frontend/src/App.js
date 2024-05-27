@@ -2,6 +2,8 @@ import './App.css';
 import React, { useState } from 'react';
 const fetch = require('node-fetch');
 const Web3 = require('web3');
+const crypto = require('crypto-js');
+
 window.ethereum.request({ method: 'eth_requestAccounts' });
 const web3 = new Web3(window.ethereum);
 
@@ -43,7 +45,8 @@ function App() {
   };
 
   async function deployContract() {
-    fetch('http://localhost:3000')
+    console.log('Deploying contract...', clearPassword);
+    fetch('http://localhost:4000')
       .then((res) => res.json())
       .then(async (compiledContract) => {
         const accounts = await web3.eth.getAccounts();
@@ -70,18 +73,18 @@ function App() {
       let dMeasurementsString = JSON.stringify(dMeasurements);
       const encryptedMapBasic = crypto.AES.encrypt(
         basicMeasurementsString,
-        passwordClearTextBasic
+        clearBasicPassword
       ).toString();
+      // console.log(
+      //   '🚀 ~ updateMeasurements ~ encryptedMapBasic:',
+      //   encryptedMapBasic
+      // );
       const encryptedMapTailor = crypto.AES.encrypt(
         dMeasurementsString,
-        passwordClearTextTailor
+        clearDPassword
       ).toString();
       await deployedContract.methods
-        .setMeasurements(
-          passwordClearText,
-          encryptedMapBasic,
-          encryptedMapTailor
-        )
+        .setMeasurements(clearPassword, encryptedMapBasic, encryptedMapTailor)
         .send({ from: accounts[0], gas: 5000000 });
     } catch (error) {
       console.error('Error updating maps: ', error);
@@ -92,23 +95,75 @@ function App() {
     let newMapBasicEncrypted = await deployedContract.methods
       .basicMeasurements()
       .call();
+    console.log(
+      '🚀 ~ loadMeasurements ~ newMapBasicEncrypted:',
+      newMapBasicEncrypted
+    );
     let newMapTailorEncrypted = await deployedContract.methods
       .detailedMeasurements()
       .call();
 
     let mapBasicBytes = crypto.AES.decrypt(
       newMapBasicEncrypted,
-      passwordClearTextBasic
+      clearBasicPassword
     );
     let mapTailorBytes = crypto.AES.decrypt(
       newMapTailorEncrypted,
-      passwordClearTextTailor
+      clearDPassword
     );
-    SetMapBasic(JSON.parse(mapBasicBytes.toString(crypto.enc.Utf8)));
-    setMapTailor(JSON.parse(mapTailorBytes.toString(crypto.enc.Utf8)));
+    setBasicMeasurements(JSON.parse(mapBasicBytes.toString(crypto.enc.Utf8)));
+    setDMeasurements(JSON.parse(mapTailorBytes.toString(crypto.enc.Utf8)));
   }
 
-  return <div className='App'></div>;
+  return (
+    <div className='App'>
+      <h1>Shy Things Body Measurements</h1>
+      <h3>Contract address: {deployedAddress}</h3>
+      <div>
+        <label>Contract password</label>
+        <input type='text' onChange={handleClearPassword} />
+        <button onClick={deployContract}>Deploy Contract</button>
+      </div>
+      <div>
+        <label>Basic Password</label>
+        <input type='text' onChange={handleClearBasicPassword} />
+      </div>
+      <div>
+        <label>Tailor Password</label>
+        <input type='text' onChange={handleClearDPassword} />
+      </div>
+      <h3>Basic Body Measurements</h3>
+      {Object.keys(basicMeasurements).map((key) => (
+        <div key={key}>
+          <label>
+            {key}:
+            <input
+              type='text'
+              value={basicMeasurements[key]}
+              onChange={(e) => handleBasicMeasurements(e, key)}
+            />
+          </label>
+        </div>
+      ))}
+      <h3>Basic Detailed Measurements</h3>
+      {Object.keys(dMeasurements).map((key) => (
+        <div key={key}>
+          <label>
+            {key}:
+            <input
+              type='text'
+              value={dMeasurements[key]}
+              onChange={(e) => handleDMeasurements(e, key)}
+            />
+          </label>
+        </div>
+      ))}
+      <br />
+      <button onClick={updateMeasurements}>Update Body Maps</button>
+      <br />
+      <button onClick={loadMeasurements}>Load Body Maps</button>
+    </div>
+  );
 }
 
 export default App;
