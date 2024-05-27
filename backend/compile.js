@@ -27,4 +27,4 @@ const output = JSON.parse(solc.compile(JSON.stringify(input)));
 const mainContract = output.contracts[contractToCompile]['Measurements'];
 // console.log('🚀 ~ mainContract:', mainContract);
 
-module.exports = mainContract;
+module.exports = { compiledContract: mainContract };

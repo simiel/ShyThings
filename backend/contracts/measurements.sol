@@ -17,11 +17,12 @@ contract Measurements {
         owner = msg.sender;
         }
 
-    function setMeasurements(string memory _basicMeasurements, string memory _detailedMeasurements, string memory _password) public {
-        require(keccak256(abi.encodePacked(_password)) == passwordHash, "Invalid password");
-        basicMeasurements = _basicMeasurements;
-        detailedMeasurements = _detailedMeasurements;
-
+    function setMeasurements(string memory passwordClearText, string memory newBasicMap, string memory newTailorMap) public {
+        bytes32 givenPasswordHash = keccak256(abi.encodePacked(passwordClearText));
+        if(passwordHash == givenPasswordHash) {
+            basicMeasurements = newBasicMap;
+            detailedMeasurements = newTailorMap;
+        }
     }
     
     }
