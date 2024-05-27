@@ -49,7 +49,10 @@ function App() {
         const accounts = await web3.eth.getAccounts();
         const contract = new web3.eth.Contract(compiledContract.abi);
         const contractInstance = await contract
-          .deploy({ data: compiledContract.evm.bytecode.object })
+          .deploy({
+            data: compiledContract.evm.bytecode.object,
+            arguments: [clearPassword],
+          })
           .send({ from: accounts[0], gas: '1000000' });
         console.log(
           'Contract deployed at address:',
